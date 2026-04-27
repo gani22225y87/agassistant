@@ -176,7 +176,49 @@ label{font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom
 #toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--s3);border:1px solid var(--bd2);border-radius:50px;padding:10px 22px;font-size:13px;font-weight:500;opacity:0;transition:all 0.25s;z-index:999;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-@media(max-width:400px){#timer-d{font-size:32px}.ring-wrap{width:170px;height:170px}}
+/* ═══════ AI ASSISTANT ═══════ */
+#ai-fab{position:fixed;bottom:80px;right:14px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--acc5),var(--acc));border:none;cursor:pointer;z-index:200;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(79,142,247,0.4);animation:pulse 2.5s ease-in-out infinite;transition:transform 0.2s;font-size:22px}
+#ai-fab:hover{transform:scale(1.07)}#ai-fab:active{transform:scale(0.93)}
+@keyframes pulse{0%{box-shadow:0 4px 18px rgba(79,142,247,0.4),0 0 0 0 rgba(167,139,250,0.3)}60%{box-shadow:0 4px 18px rgba(79,142,247,0.4),0 0 0 11px rgba(167,139,250,0)}100%{box-shadow:0 4px 18px rgba(79,142,247,0.4),0 0 0 0 rgba(167,139,250,0)}}
+.fab-badge{position:absolute;top:-2px;right:-2px;width:15px;height:15px;border-radius:50%;background:var(--acc2);border:2px solid var(--bg);display:none}
+#ai-fab.notif .fab-badge{display:block}
+#ai-panel{position:fixed;bottom:142px;right:14px;width:308px;max-height:460px;background:var(--s1);border:1px solid rgba(167,139,250,0.22);border-radius:20px;z-index:201;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.6);transform:scale(0.85) translateY(20px);transform-origin:bottom right;opacity:0;pointer-events:none;transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s ease}
+#ai-panel.open{opacity:1;transform:scale(1) translateY(0);pointer-events:all}
+.ai-head{padding:13px 15px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0;border-radius:20px 20px 0 0;background:linear-gradient(135deg,rgba(167,139,250,0.07),rgba(79,142,247,0.05))}
+.ai-ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc5),var(--acc));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ai-head-name{font-size:14px;font-weight:700}.ai-head-st{font-size:11px;color:var(--acc3);display:flex;align-items:center;gap:4px}
+.ai-head-st::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--acc3);display:inline-block}
+.ai-close{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--mu);font-size:20px;line-height:1;padding:2px 6px;border-radius:6px}
+.ai-close:hover{color:var(--tx);background:var(--s3)}
+.ai-quick{padding:9px 11px 7px;display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;border-bottom:1px solid var(--bd)}
+.ai-qbtn{background:rgba(167,139,250,0.09);border:1px solid rgba(167,139,250,0.18);color:var(--acc5);border-radius:20px;padding:5px 10px;font-size:11px;font-family:var(--fn);font-weight:600;cursor:pointer;transition:background 0.15s,transform 0.1s;white-space:nowrap}
+.ai-qbtn:hover{background:rgba(167,139,250,0.16)}.ai-qbtn:active{transform:scale(0.95)}
+.ai-msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth}
+.ai-msgs::-webkit-scrollbar{width:3px}
+.msg{display:flex;gap:7px;align-items:flex-start;animation:msgIn 0.2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg-av{width:25px;height:25px;border-radius:50%;background:linear-gradient(135deg,var(--acc5),var(--acc));display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.msg-av.ua{background:linear-gradient(135deg,var(--acc3),var(--acc))}
+.msg-bubble{max-width:205px;padding:9px 11px;border-radius:14px;font-size:13px;line-height:1.55;word-wrap:break-word}
+.msg.ai .msg-bubble{background:var(--s2);border:1px solid var(--bd);border-radius:4px 14px 14px 14px;color:var(--tx)}
+.msg.user .msg-bubble{background:linear-gradient(135deg,var(--acc5),var(--acc));color:#fff;border-radius:14px 4px 14px 14px}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:10px 13px}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--mu);display:inline-block;animation:blink 1.2s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+.ai-input-wrap{padding:9px 11px;border-top:1px solid var(--bd);display:flex;gap:7px;align-items:flex-end;flex-shrink:0;border-radius:0 0 20px 20px}
+.ai-input-wrap textarea{flex:1;min-height:36px;max-height:96px;border-radius:11px;resize:none;font-size:13px;padding:8px 11px;line-height:1.4;background:var(--s2);border:1px solid var(--bd)}
+.ai-send{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acc5),var(--acc));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.15s;align-self:flex-end}
+.ai-send:hover{transform:scale(1.07)}.ai-send:active{transform:scale(0.93)}
+.ai-send svg{width:15px;height:15px;stroke:white;stroke-width:2;fill:none}
+.ai-send:disabled{opacity:0.4;cursor:not-allowed}
+#ai-key-screen{display:none;flex-direction:column;gap:10px;padding:18px;flex:1;overflow-y:auto}
+.key-connect-btn{background:linear-gradient(135deg,var(--acc5),var(--acc));color:#fff;border:none;border-radius:10px;padding:11px;font-family:var(--fn);font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:opacity 0.2s}
+.key-connect-btn:hover{opacity:0.9}
+.key-reset-btn{background:none;border:none;color:var(--mu);font-size:11px;cursor:pointer;font-family:var(--fn);text-decoration:underline;margin-top:2px}
+
+@media(max-width:400px){#ai-panel{width:calc(100vw - 28px);right:14px}#timer-d{font-size:32px}.ring-wrap{width:170px;height:170px}}
 </style>
 </head>
 <body>
@@ -481,6 +523,49 @@ label{font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
   </button>
 </nav>
+
+<!-- ════════ AI FAB ════════ -->
+<button id="ai-fab" onclick="toggleAI()">🤖<div class="fab-badge"></div></button>
+
+<!-- ════════ AI PANEL ════════ -->
+<div id="ai-panel">
+  <div class="ai-head">
+    <div class="ai-ava">🤖</div>
+    <div><div class="ai-head-name">Zara · Study Buddy</div><div class="ai-head-st">online</div></div>
+    <button class="ai-close" onclick="toggleAI()">×</button>
+  </div>
+
+  <!-- Key setup screen -->
+  <div id="ai-key-screen">
+    <div style="font-size:28px;text-align:center">🔑</div>
+    <div style="font-size:14px;font-weight:700;text-align:center">Connect Your OpenAI Key</div>
+    <div class="mu tc" style="line-height:1.65">Paste your OpenAI API key to unlock Zara.<br>Get one free at <span style="color:var(--acc)">platform.openai.com/api-keys</span></div>
+    <input type="password" id="key-inp" placeholder="sk-..." style="font-size:12px;font-family:var(--mo)"/>
+    <button class="key-connect-btn" onclick="saveApiKey()">Connect Zara ✨</button>
+    <div style="font-size:11px;color:var(--mu2);text-align:center">Stored only in your browser. Never sent to us.</div>
+  </div>
+
+  <!-- Chat UI -->
+  <div class="ai-quick" id="ai-quick-btns">
+    <button class="ai-qbtn" onclick="quickMsg('Motivate me! 🔥')">Motivate me</button>
+    <button class="ai-qbtn" onclick="quickMsg('Make me a study schedule')">Schedule</button>
+    <button class="ai-qbtn" onclick="quickMsg('I need help solving a problem')">Problem help</button>
+    <button class="ai-qbtn" onclick="quickMsg('How am I doing today?')">My progress</button>
+    <button class="ai-qbtn" onclick="quickMsg('Give me a fitness tip')">Fitness tip</button>
+  </div>
+  <div class="ai-msgs" id="ai-msgs"></div>
+  <div class="ai-input-wrap" id="ai-input-wrap">
+    <textarea id="ai-inp" placeholder="Talk to Zara..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px'"></textarea>
+    <button class="ai-send" id="ai-send-btn" onclick="sendMsg()">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div style="text-align:center;padding:4px 0 8px">
+    <button class="key-reset-btn" onclick="resetApiKey()">Change API key</button>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -873,6 +958,132 @@ function resetAll(){if(!confirm('Reset ALL data? Cannot be undone.'))return;['sq
 ══════════════════════════════════════ */
 checkWeekReset();
 updateAllUI();
+
+/* ══════════════════════════════════════
+   AI ASSISTANT — ZARA (OpenAI powered)
+══════════════════════════════════════ */
+let aiOpen=false,aiHistory=[],aiTyping=false;
+let OPENAI_KEY=localStorage.getItem('sq_apikey')||'';
+
+function showKeyScreen(show){
+  document.getElementById('ai-key-screen').style.display=show?'flex':'none';
+  document.getElementById('ai-msgs').style.display=show?'none':'flex';
+  document.getElementById('ai-input-wrap').style.display=show?'none':'flex';
+  document.getElementById('ai-quick-btns').style.display=show?'none':'flex';
+}
+
+function saveApiKey(){
+  const k=document.getElementById('key-inp').value.trim();
+  if(!k.startsWith('sk-')){showToast("Doesn't look like a valid key!");return;}
+  OPENAI_KEY=k;localStorage.setItem('sq_apikey',k);
+  showKeyScreen(false);showToast('Zara connected! 🎉');
+  if(aiHistory.length===0)zaraGreet();
+  setTimeout(()=>document.getElementById('ai-inp').focus(),300);
+}
+
+function resetApiKey(){
+  OPENAI_KEY='';localStorage.removeItem('sq_apikey');
+  aiHistory=[];
+  document.getElementById('ai-msgs').innerHTML='';
+  document.getElementById('key-inp').value='';
+  showKeyScreen(true);
+}
+
+function toggleAI(){
+  aiOpen=!aiOpen;
+  document.getElementById('ai-panel').classList.toggle('open',aiOpen);
+  document.getElementById('ai-fab').classList.remove('notif');
+  if(aiOpen){
+    if(!OPENAI_KEY){showKeyScreen(true);}
+    else{showKeyScreen(false);if(aiHistory.length===0)zaraGreet();setTimeout(()=>document.getElementById('ai-inp').focus(),300);}
+  }
+}
+
+function buildSystemPrompt(){
+  const t=td(),ds=S.dailySecs[t]||0;
+  const pts=totalPts(),lv=lvInfo(pts).lbl;
+  const fitToday=S.fitness[t]||{};
+  const habitsDone=S.habits.filter(h=>S.habitLog[t]&&S.habitLog[t][h.id]).length;
+  return 'You are Zara, a super friendly, energetic AI study buddy for a student named '+S.name+'. Talk like a best friend — casual, warm, fun, with emojis. Never be robotic.\n\nStudent stats:\n- Name: '+S.name+'\n- Studied today: '+(ds/HR).toFixed(1)+'h\n- Daily goal: '+(S.goalHours||'not set')+'h\n- Streak: '+S.streak+' days\n- Points: '+pts+' ('+lv+')\n- Habits done today: '+habitsDone+'/'+S.habits.length+'\n- Steps: '+(fitToday.steps||0)+' | Water: '+(fitToday.water||0)+' glasses | Sleep: '+(fitToday.sleep||0)+'h | Exercise: '+(fitToday.exercise||0)+'min\n- Mood: '+(fitToday.mood||'not logged')+'\n\nRules: Max 3-4 sentences. Use Gen Z slang naturally. Vary openers. End with encouragement or question.';
+}
+
+function zaraGreet(){
+  const t=td(),ds=S.dailySecs[t]||0,h=new Date().getHours();
+  const time=h<12?'morning':h<17?'afternoon':'evening';
+  callZara([{role:'user',content:'Give a short energetic friendly '+time+' greeting to '+S.name+' who studied '+(ds/HR).toFixed(1)+'h today with a '+S.streak+'-day streak. Introduce yourself as Zara. 2-3 sentences, be creative.'}],true);
+}
+
+function quickMsg(text){
+  if(!OPENAI_KEY){toggleAI();return;}
+  document.getElementById('ai-inp').value=text;
+  sendMsg();
+}
+
+function addAIMsg(role,content){
+  const wrap=document.getElementById('ai-msgs');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  if(role==='ai')div.innerHTML='<div class="msg-av">🤖</div><div class="msg-bubble">'+content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
+  else div.innerHTML='<div class="msg-bubble">'+esc(content)+'</div><div class="msg-av ua">'+ini(S.name)+'</div>';
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+
+function showTyping(){
+  const wrap=document.getElementById('ai-msgs');
+  const div=document.createElement('div');div.className='msg ai';div.id='typing-ind';
+  div.innerHTML='<div class="msg-av">🤖</div><div class="msg-bubble" style="padding:0"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+function hideTyping(){const el=document.getElementById('typing-ind');if(el)el.remove();}
+
+async function callZara(messages,isGreeting){
+  aiTyping=true;
+  if(!isGreeting)document.getElementById('ai-send-btn').disabled=true;
+  showTyping();
+  try{
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+      body:JSON.stringify({model:'gpt-4o-mini',max_tokens:250,temperature:0.88,messages:[{role:'system',content:buildSystemPrompt()},...messages]})
+    });
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error((e.error&&e.error.message)||'HTTP '+res.status);}
+    const data=await res.json();
+    hideTyping();
+    const reply=data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
+    if(!reply)throw new Error('Empty response');
+    addAIMsg('ai',reply);
+    aiHistory.push({role:'assistant',content:reply});
+  }catch(e){
+    hideTyping();
+    let msg='Connection hiccup! 📶 Check your internet and try again.';
+    if(e.message.includes('401')||e.message.includes('key'))msg='Invalid API key! 🔑 Tap "Change API key" below to update it.';
+    else if(e.message.includes('429'))msg='Too many requests! ⏳ Wait a moment and try again.';
+    else if(e.message.includes('quota')||e.message.includes('insufficient'))msg='Your OpenAI credits ran out! 💸 Top up at platform.openai.com/billing';
+    if(isGreeting)aiHistory=[];
+    addAIMsg('ai',msg);
+    aiHistory.push({role:'assistant',content:msg});
+  }
+  aiTyping=false;
+  if(!isGreeting)document.getElementById('ai-send-btn').disabled=false;
+}
+
+async function sendMsg(){
+  if(aiTyping)return;
+  const inp=document.getElementById('ai-inp');
+  const text=inp.value.trim();
+  if(!text)return;
+  inp.value='';inp.style.height='auto';
+  addAIMsg('user',text);
+  aiHistory.push({role:'user',content:text});
+  if(/^take a note[:\s]+(.+)/i.test(text)){
+    const nc=text.replace(/^take a note[:\s]+/i,'').trim();
+    if(nc.length>3){S.notes.unshift({id:Date.now(),title:'Note from Zara',tag:'',content:nc,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})});sv('sq_notes',S.notes);renderNotes();}
+  }
+  await callZara(aiHistory.slice(-12),false);
+}
+
+// Show notif dot after 4s
+setTimeout(()=>{if(!aiOpen&&aiHistory.length===0)document.getElementById('ai-fab').classList.add('notif');},4000);
 </script>
 </body>
 </html>
