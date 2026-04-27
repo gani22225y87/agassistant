@@ -528,46 +528,7 @@ label{font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom
   </button>
 </nav>
 
-<!-- ════════ AI FAB ════════ -->
-<button id="ai-fab" onclick="toggleAI()">🤖<div class="fab-badge"></div></button>
-
-<!-- ════════ AI PANEL ════════ -->
-<div id="ai-panel">
-  <div class="ai-head">
-    <div class="ai-ava">🤖</div>
-    <div><div class="ai-head-name">Zara · Study Buddy</div><div class="ai-head-st">online</div></div>
-    <button class="ai-close" onclick="toggleAI()">×</button>
-  </div>
-  <div class="ai-quick">
-    <button class="ai-qbtn" onclick="quickMsg('Motivate me! 🔥')">Motivate me</button>
-    <button class="ai-qbtn" onclick="quickMsg('Make me a study schedule')">Schedule</button>
-    <button class="ai-qbtn" onclick="quickMsg('I need help solving a problem')">Problem help</button>
-    <button class="ai-qbtn" onclick="quickMsg('Take a note: ')">Quick note</button>
-    <button class="ai-qbtn" onclick="quickMsg('How am I doing today?')">My progress</button>
-    <button class="ai-qbtn" onclick="quickMsg('Give me a fitness tip')">Fitness tip</button>
-  </div>
-
-  <!-- Key setup screen (hidden - AI works without a key) -->
-  <div id="ai-key-screen" style="display:none">
-    <div style="font-size:26px;text-align:center">🔑</div>
-    <div style="font-size:14px;font-weight:700;text-align:center">Connect Zara to OpenAI</div>
-    <div class="mu tc" style="line-height:1.65">Paste your OpenAI API key to unlock Zara's full AI powers.<br><span style="color:var(--acc)">platform.openai.com/api-keys</span></div>
-    <input type="password" id="key-inp" placeholder="sk-proj-..." style="font-size:12px;font-family:var(--mo)"/>
-    <button class="key-connect-btn" onclick="saveApiKey()">Connect Zara ✨</button>
-    <div style="font-size:11px;color:var(--mu2);text-align:center">Stored only on your device. Never shared.</div>
-  </div>
-
-  <div class="ai-msgs" id="ai-msgs"></div>
-
-  <div class="ai-input-wrap" id="ai-input-wrap">
-    <textarea id="ai-inp" placeholder="Talk to Zara..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px'"></textarea>
-    <button class="ai-send" id="ai-send-btn" onclick="sendMsg()">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-</div>
+<!-- AI chat removed for web deployment -->
 
 <div id="toast"></div>
 
@@ -585,11 +546,10 @@ const SDAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const COLS   = ['#4f8ef7','#f59e0b','#f76b8a','#34d399','#a78bfa','#38bdf8','#fb923c'];
 
 /* ══════════════════════════════════════
-   STORAGE — in-memory (artifact-safe)
+   STORAGE
 ══════════════════════════════════════ */
-const _store = {};
-const ld=(k,d)=>{try{const v=_store[k];return v!==undefined?JSON.parse(v):d;}catch{return d;}};
-const sv=(k,v)=>{_store[k]=JSON.stringify(v);};
+const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch{return d;}};
+const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const td=()=>new Date().toISOString().slice(0,10);
 
 /* ══════════════════════════════════════
@@ -954,150 +914,15 @@ function navigate(p){
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 function ini(name){return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'ME';}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function resetAll(){if(!confirm('Reset ALL data? Cannot be undone.'))return;['sq_name','sq_totalSecs','sq_dailySecs','sq_weekSecs','sq_weekStart','sq_streak','sq_bestStreak','sq_lastStudy','sq_goalHours','sq_schedule','sq_notes','sq_sessions','sq_habits','sq_habitLog','sq_fitness'].forEach(k=>delete _store[k]);Object.assign(S,{name:'Student',totalSecs:0,dailySecs:{},weekSecs:0,weekStart:td(),streak:0,bestStreak:0,lastStudy:null,goalHours:0,schedule:[],notes:[],sessions:[],habits:[],habitLog:{},fitness:{}});updateAllUI();showToast('Data reset!');}
+function resetAll(){if(!confirm('Reset ALL data? Cannot be undone.'))return;['sq_name','sq_totalSecs','sq_dailySecs','sq_weekSecs','sq_weekStart','sq_streak','sq_bestStreak','sq_lastStudy','sq_goalHours','sq_schedule','sq_notes','sq_sessions','sq_habits','sq_habitLog','sq_fitness'].forEach(k=>localStorage.removeItem(k));location.reload();}
 
-/* ══════════════════════════════════════════════════
-   AI ASSISTANT — ZARA (OpenAI powered)
-══════════════════════════════════════════════════ */
-let aiOpen=false, aiHistory=[], aiTyping=false;
-let OPENAI_KEY=_store['sq_apikey']||'';
-
-function saveApiKey(){
-  const k=document.getElementById('key-inp').value.trim();
-  if(!k.startsWith('sk-')){showToast("Doesn't look like a valid key!");return;}
-  OPENAI_KEY=k; _store['sq_apikey']=k;
-  showKeyScreen(false); showToast('Zara connected! 🎉');
-  if(aiHistory.length===0) zaraGreet();
-}
-
-function showKeyScreen(show){
-  document.getElementById('ai-key-screen').style.display=show?'flex':'none';
-  document.getElementById('ai-msgs').style.display=show?'none':'';
-  document.getElementById('ai-input-wrap').style.display=show?'none':'';
-}
-
-function toggleAI(){
-  aiOpen=!aiOpen;
-  document.getElementById('ai-panel').classList.toggle('open',aiOpen);
-  document.getElementById('ai-fab').classList.remove('notif');
-  if(aiOpen){
-    showKeyScreen(false);
-    if(aiHistory.length===0) zaraGreet();
-    setTimeout(()=>document.getElementById('ai-inp').focus(),300);
-  }
-}
-
-function buildSystemPrompt(){
-  const t=td(),ds=S.dailySecs[t]||0;
-  const pts=totalPts(),lv=lvInfo(pts).lbl;
-  const fitToday=S.fitness[t]||{};
-  const habitsDone=S.habits.filter(h=>S.habitLog[t]&&S.habitLog[t][h.id]).length;
-  return 'You are Zara, a super friendly, energetic AI study buddy for a school student (age 13-18) named '+S.name+'. Talk exactly like a best friend — casual, warm, fun, with emojis. Never be robotic or formal.\n\nStudent stats right now:\n- Name: '+S.name+'\n- Studied today: '+(ds/HR).toFixed(1)+'h\n- Daily goal: '+(S.goalHours||'not set')+'h\n- Streak: '+S.streak+' days\n- Points: '+pts+' ('+lv+')\n- Habits done today: '+habitsDone+'/'+S.habits.length+'\n- Steps: '+(fitToday.steps||0)+' | Water: '+(fitToday.water||0)+' glasses | Sleep: '+(fitToday.sleep||0)+'h | Exercise: '+(fitToday.exercise||0)+'min\n- Mood: '+(fitToday.mood||'not logged yet')+'\n\nYou can help with: motivation, study schedules, problem solving, notes, fitness tips, habit advice, general chat.\n\nRules:\n- MAXIMUM 3-4 sentences per reply. Be punchy not verbose.\n- Always use their real stats when relevant.\n- Sound like a Gen Z best friend: "omg", "bestie", "ngl", "lowkey", "no cap", "fr fr" etc.\n- Vary your style every message — never repeat the same opener.\n- If they say "take a note: X", confirm you noted it.\n- End with a question or encouragement to keep chatting.\n- NEVER start with "Hey! 👋 0.0h studied" — that is a banned phrase.';
-}
-
-function zaraGreet(){
-  const t=td(),ds=S.dailySecs[t]||0,h=new Date().getHours();
-  const time=h<12?'morning':h<17?'afternoon':'evening';
-  const prompt='Give a short, energetic, friendly '+time+' greeting to '+S.name+' who has studied '+(ds/HR).toFixed(1)+'h today and has a '+S.streak+'-day streak. Introduce yourself as Zara. 2-3 sentences max. Be creative and different each time — no robotic templates.';
-  callOpenAI([{role:'user',content:prompt}],true);
-}
-
-function quickMsg(text){
-  if(text.endsWith(': ')){
-    document.getElementById('ai-inp').value=text;
-    document.getElementById('ai-inp').focus();
-    return;
-  }
-  document.getElementById('ai-inp').value=text;
-  sendMsg();
-}
-
-function addAIMsg(role,content){
-  const wrap=document.getElementById('ai-msgs');
-  const div=document.createElement('div');
-  div.className='msg '+role;
-  if(role==='ai') div.innerHTML='<div class="msg-av">🤖</div><div class="msg-bubble">'+content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')+'</div>';
-  else div.innerHTML='<div class="msg-bubble">'+esc(content)+'</div><div class="msg-av ua">'+ini(S.name)+'</div>';
-  wrap.appendChild(div);
-  wrap.scrollTop=wrap.scrollHeight;
-}
-
-function showTyping(){
-  const wrap=document.getElementById('ai-msgs');
-  const div=document.createElement('div');
-  div.className='msg ai'; div.id='typing-ind';
-  div.innerHTML='<div class="msg-av">🤖</div><div class="msg-bubble" style="padding:0"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
-  wrap.appendChild(div); wrap.scrollTop=wrap.scrollHeight;
-}
-function hideTyping(){const el=document.getElementById('typing-ind');if(el)el.remove();}
-
-/* Core API call — uses Anthropic API */
-async function callOpenAI(messages, isGreeting){
-  aiTyping=true;
-  if(!isGreeting) document.getElementById('ai-send-btn').disabled=true;
-  showTyping();
-  try{
-    const systemPrompt=buildSystemPrompt();
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:systemPrompt,
-        messages:messages.map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))
-      })
-    });
-    if(!res.ok){
-      const e=await res.json().catch(()=>({}));
-      throw new Error((e.error&&e.error.message)||'HTTP '+res.status);
-    }
-    const data=await res.json();
-    hideTyping();
-    const reply=data.content&&data.content[0]&&data.content[0].text;
-    if(!reply) throw new Error('Empty response');
-    addAIMsg('ai',reply);
-    aiHistory.push({role:'assistant',content:reply});
-  }catch(e){
-    hideTyping();
-    console.warn('Zara error:',e.message);
-    const errMsg='Connection hiccup! 📶 Check your internet and try again. I\'m here for you!';
-    if(isGreeting) aiHistory=[];
-    addAIMsg('ai',errMsg);
-    aiHistory.push({role:'assistant',content:errMsg});
-  }
-  aiTyping=false;
-  if(!isGreeting) document.getElementById('ai-send-btn').disabled=false;
-}
-
-async function sendMsg(){
-  if(aiTyping) return;
-  const inp=document.getElementById('ai-inp');
-  const text=inp.value.trim();
-  if(!text) return;
-  inp.value=''; inp.style.height='auto';
-  addAIMsg('user',text);
-  aiHistory.push({role:'user',content:text});
-
-  // Note shortcut
-  if(/^take a note[:\s]+(.+)/i.test(text)){
-    const nc=text.replace(/^take a note[:\s]+/i,'').trim();
-    if(nc.length>3){
-      S.notes.unshift({id:Date.now(),title:'Note from Zara',tag:'',content:nc,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})});
-      sv('sq_notes',S.notes); renderNotes();
-    }
-  }
-  await callOpenAI(aiHistory.slice(-12),false);
-}
 
 /* ══════════════════════════════════════
    INIT
 ══════════════════════════════════════ */
 checkWeekReset();
-showKeyScreen(false); // hide by default; panel shows on open
 updateAllUI();
-// Ping notification dot after 4s if not opened
-setTimeout(()=>{if(!aiOpen&&aiHistory.length===0) document.getElementById('ai-fab').classList.add('notif');},4000);
+
 </script>
 </body>
 </html>
